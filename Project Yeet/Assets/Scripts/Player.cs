@@ -6,28 +6,30 @@ public class Player : MonoBehaviour
 {
     // Variables
     public float movementSpeed;
+    public int maxHealth = 130;
+    public int health = 130;
+
+    public RectTransform healthBar;
+    public RectTransform canvas;
+    private float barMaxX;
+    private float barMinX;
 
     private Rigidbody rb;
+
 
 
     // Methods
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+
+        barMaxX = healthBar.offsetMax.x;
+        barMinX = healthBar.offsetMin.x;
     }
 
     void FixedUpdate()
     {
         // Player Movement
-
-        /*if (Input.GetKey(KeyCode.W))
-            transform.Translate(new Vector3(0, 0, 1) * movementSpeed * Time.deltaTime, Space.World);
-        if (Input.GetKey(KeyCode.S))
-            transform.Translate(new Vector3(0, 0, -1) * movementSpeed * Time.deltaTime, Space.World);
-        if (Input.GetKey(KeyCode.A))
-            transform.Translate(new Vector3(-1, 0, 0) * movementSpeed * Time.deltaTime, Space.World);
-        if (Input.GetKey(KeyCode.D))
-            transform.Translate(new Vector3(1, 0, 0) * movementSpeed * Time.deltaTime, Space.World);*/
 
         if (Input.GetKey(KeyCode.W))
             rb.MovePosition(transform.position + (Vector3.forward * movementSpeed * Time.deltaTime));
@@ -56,6 +58,8 @@ public class Player : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 10f * Time.deltaTime);
         }
 
+        // Player attack
+
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             Ray melee = new Ray(transform.position, transform.forward);
@@ -71,6 +75,38 @@ public class Player : MonoBehaviour
             }
 
         }
+
+        // Player health
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            this.ReduceHealth(5);
+        }
+        
+
+
+        if (this.health <= 0)
+        {
+
+        }
     }
+
+
+    // Player Methods
+
+    public void ReduceHealth(int h)
+    {
+        this.health -= h;
+        float healthPercent = 1 - ((float)this.health / maxHealth);
+        Debug.Log(healthPercent);
+        float barSize = healthPercent * (canvas.sizeDelta.x + barMaxX - barMinX);
+        Debug.Log(-barSize + barMaxX);
+        healthBar.offsetMax = new Vector2(-barSize + barMaxX, healthBar.offsetMax.y);
+    }
+
+    public void setHealth(int h)
+    {
+
+    }
+
 
 }
