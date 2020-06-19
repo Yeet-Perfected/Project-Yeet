@@ -11,10 +11,10 @@ public class Player : MonoBehaviour
     public int health = 130;
 
     public Slider healthBar;
-    private float barMaxX;
-    private float barMinX;
 
     private Rigidbody rb;
+
+    private int lastEquippedByIndex = 0;
 
 
 
@@ -29,13 +29,13 @@ public class Player : MonoBehaviour
         // Player Movement
 
         if (Input.GetKey(KeyCode.W))
-            rb.MovePosition(transform.position + (Vector3.forward * movementSpeed * Time.deltaTime));
+            transform.Translate(Vector3.forward * movementSpeed * Time.deltaTime, Space.World);
         if (Input.GetKey(KeyCode.S))
-            rb.MovePosition(transform.position + (Vector3.back * movementSpeed * Time.deltaTime));
+            transform.Translate(Vector3.back * movementSpeed * Time.deltaTime, Space.World);
         if (Input.GetKey(KeyCode.A))
-            rb.MovePosition(transform.position + (Vector3.left * movementSpeed * Time.deltaTime));
+            transform.Translate(Vector3.left * movementSpeed * Time.deltaTime, Space.World);
         if (Input.GetKey(KeyCode.D))
-            rb.MovePosition(transform.position + (Vector3.right * movementSpeed * Time.deltaTime));
+            transform.Translate(Vector3.right * movementSpeed * Time.deltaTime, Space.World);
 
     }
 
@@ -57,7 +57,7 @@ public class Player : MonoBehaviour
 
         // Player attack
 
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        if (Input.GetKeyDown(KeyCode.Mouse0) && Inventory.inventory[0].isEquipped())
         {
             Ray melee = new Ray(transform.position, transform.forward);
             RaycastHit hitInfo;
@@ -68,19 +68,29 @@ public class Player : MonoBehaviour
                 {
                     hitInfo.collider.gameObject.GetComponent<Enemy>().reduceHealth(5);
                 }
-                
             }
+        }
+        else if (Input.GetKeyDown(KeyCode.Mouse0) && Inventory.inventory[1].isEquipped())
+        {
+            Debug.Log("Worked!");
+        }
 
+        // Player Invetory Select
+
+        if (Input.GetKeyDown(KeyCode.Alpha1) && Inventory.inventory[0].isInInventory())
+        {
+            Inventory.inventory[lastEquippedByIndex].setEquipped(false);
+            Inventory.inventory[0].setEquipped(true);
+            lastEquippedByIndex = 0;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2) && Inventory.inventory[1].isInInventory())
+        {
+            Inventory.inventory[lastEquippedByIndex].setEquipped(false);
+            Inventory.inventory[1].setEquipped(true);
+            lastEquippedByIndex = 1;
         }
 
         // Player health
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            this.reduceHealth(5);
-        }
-        
-
-
         if (this.health <= 0)
         {
 
