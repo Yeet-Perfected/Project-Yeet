@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
@@ -9,8 +10,7 @@ public class Player : MonoBehaviour
     public int maxHealth = 130;
     public int health = 130;
 
-    public RectTransform healthBar;
-    public RectTransform canvas;
+    public Slider healthBar;
     private float barMaxX;
     private float barMinX;
 
@@ -22,9 +22,6 @@ public class Player : MonoBehaviour
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
-
-        barMaxX = healthBar.offsetMax.x;
-        barMinX = healthBar.offsetMin.x;
     }
 
     void FixedUpdate()
@@ -69,7 +66,7 @@ public class Player : MonoBehaviour
             {
                 if (hitInfo.collider.gameObject.tag == "Enemy")
                 {
-                    hitInfo.collider.gameObject.GetComponent<Enemy>().health -= 5;
+                    hitInfo.collider.gameObject.GetComponent<Enemy>().reduceHealth(5);
                 }
                 
             }
@@ -79,7 +76,7 @@ public class Player : MonoBehaviour
         // Player health
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            this.ReduceHealth(5);
+            this.reduceHealth(5);
         }
         
 
@@ -93,14 +90,11 @@ public class Player : MonoBehaviour
 
     // Player Methods
 
-    public void ReduceHealth(int h)
+    public void reduceHealth(int h)
     {
         this.health -= h;
-        float healthPercent = 1 - ((float)this.health / maxHealth);
-        Debug.Log(healthPercent);
-        float barSize = healthPercent * (canvas.sizeDelta.x + barMaxX - barMinX);
-        Debug.Log(-barSize + barMaxX);
-        healthBar.offsetMax = new Vector2(-barSize + barMaxX, healthBar.offsetMax.y);
+        float healthPercent = ((float)this.health / maxHealth);
+        healthBar.value = healthPercent;
     }
 
     public void setHealth(int h)
