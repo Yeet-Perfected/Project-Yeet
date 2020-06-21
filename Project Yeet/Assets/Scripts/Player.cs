@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.NetworkInformation;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,17 +13,21 @@ public class Player : MonoBehaviour
     public int health = 130;
 
     public Slider healthBar;
+    public Image imageSelected;
+
+    public Sprite bionicArm;
+    public Sprite placeHolder;
+    public Sprite[] sprites = new Sprite[2];
 
     private Rigidbody rb;
-
-    private int lastEquippedByIndex = 0;
-
 
 
     // Methods
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+        sprites[0] = bionicArm;
+        sprites[1] = placeHolder;
     }
 
     void FixedUpdate()
@@ -66,7 +72,15 @@ public class Player : MonoBehaviour
             {
                 if (hitInfo.collider.gameObject.tag == "Enemy")
                 {
-                    hitInfo.collider.gameObject.GetComponent<Enemy>().reduceHealth(5);
+                    if (hitInfo.collider.gameObject.GetComponent<Enemy>().canSeePlayer())
+                    {
+                        hitInfo.collider.gameObject.GetComponent<Enemy>().reduceHealth(20);
+                    }
+                    else
+                    {
+                        hitInfo.collider.gameObject.GetComponent<Enemy>().reduceHealth(100);
+                    }
+                    
                 }
             }
         }
@@ -76,19 +90,7 @@ public class Player : MonoBehaviour
         }
 
         // Player Invetory Select
-
-        if (Input.GetKeyDown(KeyCode.Alpha1) && Inventory.inventory[0].isInInventory())
-        {
-            Inventory.inventory[lastEquippedByIndex].setEquipped(false);
-            Inventory.inventory[0].setEquipped(true);
-            lastEquippedByIndex = 0;
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha2) && Inventory.inventory[1].isInInventory())
-        {
-            Inventory.inventory[lastEquippedByIndex].setEquipped(false);
-            Inventory.inventory[1].setEquipped(true);
-            lastEquippedByIndex = 1;
-        }
+        findAndEquip();
 
         // Player health
         if (this.health <= 0)
@@ -99,6 +101,24 @@ public class Player : MonoBehaviour
 
 
     // Player Methods
+
+    public bool isSelected(int index)
+    {
+        return Input.GetKeyDown(KeyCode.Alpha1 + index) && Inventory.inventory[index].isInInventory();
+    }
+
+    public void findAndEquip()
+    {
+        for (int i = 0; i < Inventory.inventory.Length; i++)
+        {
+            if (isSelected(i))
+            {
+                Inventory.setEquiped(i);
+                imageSelected.sprite = sprites[i];
+                return;
+            }
+        }
+    }
 
     public void reduceHealth(int h)
     {
