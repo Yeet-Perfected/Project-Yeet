@@ -89,6 +89,11 @@ public class Player : MonoBehaviour
             Debug.Log("Worked!");
         }
 
+        if (Input.GetKey(KeyCode.M))
+        {
+
+        }
+
         // Player Invetory Select
         findAndEquip();
 
