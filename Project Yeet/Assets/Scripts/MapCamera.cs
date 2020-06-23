@@ -22,4 +22,5 @@ public class MapCamera : MonoBehaviour
         pos.z = player.position.z;
         transform.position = pos;
     }
+
 }

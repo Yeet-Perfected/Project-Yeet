@@ -12,14 +12,16 @@ public class Player : MonoBehaviour
     public int maxHealth = 130;
     public int health = 130;
 
-    public Slider healthBar;
-    public Image imageSelected;
-
     public Sprite bionicArm;
     public Sprite placeHolder;
-    public Sprite[] sprites = new Sprite[2];
+    public Canvas canvas;
+
+    private Sprite[] sprites = new Sprite[2];
 
     private Rigidbody rb;
+    private CanvasController controller;
+
+    private bool mapEnabled = false;
 
 
     // Methods
@@ -28,6 +30,7 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         sprites[0] = bionicArm;
         sprites[1] = placeHolder;
+        controller = canvas.GetComponent<CanvasController>();
     }
 
     void FixedUpdate()
@@ -89,9 +92,20 @@ public class Player : MonoBehaviour
             Debug.Log("Worked!");
         }
 
-        if (Input.GetKey(KeyCode.M))
+        if (Input.GetKeyDown(KeyCode.M))
         {
-
+            if (mapEnabled)
+            {
+                controller.setRegMaskSize(new Vector3(1, 1, 1));
+                controller.setMapMaskSize(new Vector3(0, 0, 0));
+                mapEnabled = false;
+            }
+            else
+            {
+                controller.setRegMaskSize(new Vector3(0, 0, 0));
+                controller.setMapMaskSize(new Vector3(1, 1, 1));
+                mapEnabled = true;
+            }
         }
 
         // Player Invetory Select
@@ -119,7 +133,7 @@ public class Player : MonoBehaviour
             if (isSelected(i))
             {
                 Inventory.setEquiped(i);
-                imageSelected.sprite = sprites[i];
+                controller.selectImage(sprites[i]);
                 return;
             }
         }
@@ -129,12 +143,14 @@ public class Player : MonoBehaviour
     {
         this.health -= h;
         float healthPercent = ((float)this.health / maxHealth);
-        healthBar.value = healthPercent;
+        controller.setHealthBar(healthPercent);
     }
 
     public void setHealth(int h)
     {
-
+        this.health = h;
+        float healthPercent = ((float)this.health / maxHealth);
+        controller.setHealthBar(healthPercent);
     }
 
 
